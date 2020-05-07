@@ -9,7 +9,7 @@ class CheckPossible
     # order is possible to realise when time to courier delivery intersection with shop open time hour ranges is non-empty
     shop_working_ranges = shop_days_open_range.step(1.day).map do |day|
       shop_working_day = Time.at(day).to_datetime
-      next if holiday?(shop_working_day)
+      next if holidays.include?(shop_working_day.to_date)
 
       hours     = working_hours(shop_working_day)
       opens_at  = set_hour_to_time(time_or_day: shop_working_day, hour: hours[:opens])
@@ -25,8 +25,8 @@ class CheckPossible
 
   attr_reader :delivery_created_time, :courier_delivery_time, :config
 
-  def holiday?(date)
-    Holiday.present_on?(date)
+  def holidays
+    @holidays ||= Holiday.holidays_between(delivery_created_time, order_delivery_range.last)
   end
 
   def order_delivery_range

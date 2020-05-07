@@ -14,11 +14,8 @@ class Holiday < ApplicationRecord
   validates :day, presence: true
   validate :is_holiday?
 
+  scope :holidays_between, ->(start_date, end_date) { where("day BETWEEN ? AND ?", start_date, end_date).map(&:day).uniq }
   enumerize :kind, in: { custom: 0, non_working_sunday: 1 }
-
-  def self.present_on?(day)
-    where(day: day).present?
-  end
 
   private
 
