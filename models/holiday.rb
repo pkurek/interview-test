@@ -8,22 +8,21 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #
-
 class Holiday < ApplicationRecord
   extend Enumerize
 
   validates :day, presence: true
-  validate :check_day_is_sunday
+  validate :is_holiday?
 
   enumerize :kind, in: { custom: 0, non_working_sunday: 1 }
 
   def self.present_on?(day)
-    Holiday.any? { |holiday| holiday.day == day.to_date }
+    where(day: day).present?
   end
 
   private
 
-  def check_day_is_sunday
+  def is_holiday?
     errors.add(:day, :invalid) unless day.sunday?
   end
 end
